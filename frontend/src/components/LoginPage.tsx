@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import {UserRole} from "./Auth.tsx";
 enum AuthMode {
     Login,
     Register,
@@ -10,11 +10,6 @@ interface User {
     email: string;
     password: string;
     role: UserRole;
-}
-
-enum UserRole {
-    User = 'user',
-    Admin = 'admin',
 }
 
 const initialAdminUser: User = {

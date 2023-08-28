@@ -1,61 +1,86 @@
 import {useEffect, useState} from 'react';
 import AddPostModal from './AddPostModal';
-
+import EditPost from "./EditPost.tsx";
+import {UserRole} from './Auth.tsx'
+import RemovePost from "./RemovePost.tsx";
+import avatar_147142 from '../assets/avatar_147142.png';
+import avatar_168732 from '../assets/avatar_168732.png'
 interface Post {
     id: number;
     title: string;
     content: string;
-    author: string;
-    accountType: string;
+    author: {
+        name: string;
+        accountType: string;
+        photo: string;
+    };
     comments: number;
 }
+
 const dummyPosts: Post[] = [
     {
         id: 1,
         title: 'First Post',
         content: 'This is the content of the first post.',
-        author: 'John Doe',
-        accountType: 'Premium',
+        author: {
+            name: 'John Doe',
+            accountType: 'Premium',
+            photo: avatar_147142, // Replace with actual file path
+        },
         comments: 3,
     },
     {
         id: 2,
         title: 'Second Post',
         content: 'This is the content of the second post.',
-        author: 'Jane Smith',
-        accountType: 'Basic',
+        author: {
+            name: 'Jane Smith',
+            accountType: 'Basic',
+            photo: avatar_168732, // Replace with actual file path
+        },
         comments: 5,
     },
     {
         id: 3,
         title: 'Third Post',
         content: 'This is the content of the third post.',
-        author: 'Alice Johnson',
-        accountType: 'Premium',
+        author: {
+            name: 'Alice Johnson',
+            accountType: 'Premium',
+            photo: avatar_147142, // Replace with actual file path
+        },
         comments: 2,
     },
     {
         id: 4,
         title: 'Fourth Post',
         content: 'This is the content of the fourth post.',
-        author: 'Bob Brown',
-        accountType: 'Basic',
+        author: {
+            name: 'Bob Brown',
+            accountType: 'Basic',
+            photo: avatar_168732, // Replace with actual file path
+        },
         comments: 0,
     },
     {
         id: 5,
         title: 'Fifth Post',
         content: 'This is the content of the fifth post.',
-        author: 'Eve White',
-        accountType: 'Premium',
+        author: {
+            name: 'Eve White',
+            accountType: 'Premium',
+            photo: avatar_147142, // Replace with actual file path
+        },
         comments: 7,
     },
 ];
 
-
 function HomePage() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editPostId, setEditPostId] = useState<number | null>(null);
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const [removePostId, setRemovePostId] = useState<number | null>(null);
 
     useEffect(() => {
         const savedPosts = JSON.parse(localStorage.getItem('posts') || JSON.stringify(dummyPosts));
@@ -65,12 +90,32 @@ function HomePage() {
     useEffect(() => {
         localStorage.setItem('posts', JSON.stringify(posts));
     }, [posts]);
+
     const openModal = () => {
         setIsModalOpen(true);
     };
-
     const closeModal = () => {
         setIsModalOpen(false);
+    };
+
+    const handleEditPost = (postId: number) => {
+        setEditPostId(postId); // Set the post id being edited
+    };
+    const handleEditPostSave = (postId: number, newTitle: string, newContent: string) => {
+        const updatedPosts = posts.map(post => {
+            if (post.id === postId) {
+                return { ...post, title: newTitle, content: newContent };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
+        setEditPostId(null);
+    };
+
+    const handleConfirmRemovePost = (postId: number) => {
+        const updatedPosts = posts.filter(post => post.id !== postId);
+        setPosts(updatedPosts);
+        setRemovePostId(null);
     };
 
     const handleAddPost = (title: string, content: string) => {
@@ -78,14 +123,16 @@ function HomePage() {
             id: Date.now(),
             title,
             content,
-            author: 'John Doe', // Replace with actual author name
-            accountType: 'Premium', // Replace with actual account type
-            comments: 0, // Initial comment count
+            author: {
+                name: 'John Doe',
+                accountType: 'Premium',
+                photo: avatar_147142
+            },
+            comments: 0,
         };
         setPosts([...posts, newPost]);
         closeModal();
     };
-
 
 
     return (
@@ -95,12 +142,41 @@ function HomePage() {
             <ul>
                 {posts.map(post => (
                     <li key={post.id}>
-                        <h3>{post.title + " -- Author : " + post.author}</h3>
-                        <p>{post.content}</p>
+                        <div>
+                            <h3>{post.title}</h3>
+                            <p>{post.content}</p>
+                            <div>
+                                <img src={post.author.photo} alt={post.author.name} />
+                                <p>{post.author.name}</p>
+                                <p>Account Type: {post.author.accountType}</p>
+                                <p>Comments: {post.comments}</p>
+                            </div>
+                            {currentUser && currentUser.role === UserRole.Admin && (
+                                <div>
+                                    <button onClick={() => handleEditPost(post.id)}>Edit</button>
+                                    <button onClick={() => handleConfirmRemovePost(post.id)}>Remove</button>
+                                </div>
+                            )}
+                            <button>View Details Button will be here</button>
+                        </div>
                     </li>
                 ))}
             </ul>
             {isModalOpen && <AddPostModal onClose={closeModal} onAddPost={handleAddPost} />}
+            {editPostId !== null && (
+                <EditPost
+                    postId={editPostId}
+                    onClose={() => setEditPostId(null)}
+                    onEditPost={handleEditPostSave}
+                />
+            )}
+            {removePostId !== null && (
+                <RemovePost
+                    postId={removePostId}
+                    onClose={() => setRemovePostId(null)}
+                    onConfirmRemove={handleConfirmRemovePost}
+                />
+            )}
         </div>
     );
 }

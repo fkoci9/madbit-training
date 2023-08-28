@@ -1,0 +1,43 @@
+import React, { useState } from 'react';
+
+interface EditPostModalProps {
+    postId: number;
+    onClose: () => void;
+    onEditPost: (postId: number, newTitle: string, newContent: string) => void;
+}
+
+function EditPost({ postId, onClose, onEditPost }: EditPostModalProps) {
+    const [newTitle, setNewTitle] = useState('');
+    const [newContent, setNewContent] = useState('');
+
+    const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setNewTitle(event.target.value);
+    };
+
+    const handleContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setNewContent(event.target.value);
+    };
+
+    const handleSubmit = () => {
+        onEditPost(postId, newTitle, newContent);
+        onClose();
+    };
+
+    return (
+        <div>
+            <h3>Edit Post</h3>
+            <div>
+                <label>Title:</label>
+                <input type="text" value={newTitle} onChange={handleTitleChange} />
+            </div>
+            <div>
+                <label>Content:</label>
+                <textarea value={newContent} onChange={handleContentChange} />
+            </div>
+            <button onClick={handleSubmit}>Save</button>
+            <button onClick={onClose}>Cancel</button>
+        </div>
+    );
+}
+
+export default EditPost;
