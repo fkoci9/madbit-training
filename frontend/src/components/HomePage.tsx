@@ -5,19 +5,28 @@ import {UserRole} from './Auth.tsx'
 import RemovePost from "./RemovePost.tsx";
 import avatar_147142 from '../assets/avatar_147142.png';
 import avatar_168732 from '../assets/avatar_168732.png'
+import { Link } from 'react-router-dom';
+interface Comment {
+    id: number;
+    author: string;
+    text: string;
+}
+
+interface Author {
+    name: string;
+    accountType: string;
+    photo: string;
+}
+
 interface Post {
     id: number;
     title: string;
     content: string;
-    author: {
-        name: string;
-        accountType: string;
-        photo: string;
-    };
-    comments: number;
+    author: Author;
+    comments: Comment[];
 }
 
-const dummyPosts: Post[] = [
+export const dummyPosts: Post[] = [
     {
         id: 1,
         title: 'First Post',
@@ -25,9 +34,13 @@ const dummyPosts: Post[] = [
         author: {
             name: 'John Doe',
             accountType: 'Premium',
-            photo: avatar_147142, // Replace with actual file path
+            photo: avatar_147142,
         },
-        comments: 3,
+        comments: [
+            { id: 1, author: 'Alice', text: 'Great post!' },
+            { id: 2, author: 'Bob', text: 'I agree.' },
+            { id: 3, author: 'John', text: 'Super' },
+        ],
     },
     {
         id: 2,
@@ -38,7 +51,9 @@ const dummyPosts: Post[] = [
             accountType: 'Basic',
             photo: avatar_168732, // Replace with actual file path
         },
-        comments: 5,
+        comments: [
+            { id: 1, author: 'Alice', text: 'Great post!' },
+        ],
     },
     {
         id: 3,
@@ -49,7 +64,9 @@ const dummyPosts: Post[] = [
             accountType: 'Premium',
             photo: avatar_147142, // Replace with actual file path
         },
-        comments: 2,
+        comments: [
+            { id: 2, author: 'Bob', text: 'I agree.' },
+        ],
     },
     {
         id: 4,
@@ -60,7 +77,15 @@ const dummyPosts: Post[] = [
             accountType: 'Basic',
             photo: avatar_168732, // Replace with actual file path
         },
-        comments: 0,
+        comments: [
+            { id: 1, author: 'Alice', text: 'Great post!' },
+            { id: 2, author: 'Bob', text: 'I agree.' },
+            { id: 3, author: 'John', text: 'Super' },
+            { id: 4, author: 'Fabjo', text: 'So Cool!' },
+            { id: 5, author: 'Rei', text: 'I agree.' },
+            { id: 6, author: 'Marxhes', text: 'I dont agree with it' },
+            { id: 7, author: 'Inis', text: 'I agree.' },
+        ],
     },
     {
         id: 5,
@@ -71,7 +96,9 @@ const dummyPosts: Post[] = [
             accountType: 'Premium',
             photo: avatar_147142, // Replace with actual file path
         },
-        comments: 7,
+        comments: [
+            { id: 2, author: 'Bob', text: 'I agree.' },
+        ],
     },
 ];
 
@@ -128,7 +155,7 @@ function HomePage() {
                 accountType: 'Premium',
                 photo: avatar_147142
             },
-            comments: 0,
+            comments: [],
         };
         setPosts([...posts, newPost]);
         closeModal();
@@ -149,7 +176,7 @@ function HomePage() {
                                 <img src={post.author.photo} alt={post.author.name} />
                                 <p>{post.author.name}</p>
                                 <p>Account Type: {post.author.accountType}</p>
-                                <p>Comments: {post.comments}</p>
+                                <p>Comments: {post.comments.length}</p>
                             </div>
                             {currentUser && currentUser.role === UserRole.Admin && (
                                 <div>
@@ -157,7 +184,7 @@ function HomePage() {
                                     <button onClick={() => handleConfirmRemovePost(post.id)}>Remove</button>
                                 </div>
                             )}
-                            <button>View Details Button will be here</button>
+                            <Link to={`/${post.id}/comments`}>View Details</Link>
                         </div>
                     </li>
                 ))}
