@@ -6,6 +6,10 @@ import RemovePost from "./RemovePost.tsx";
 import avatar_147142 from '../assets/avatar_147142.png';
 import avatar_168732 from '../assets/avatar_168732.png'
 import { Link } from 'react-router-dom';
+import PostComments from "./PostComments.tsx";
+import '../style/home-page.css'
+
+
 interface Comment {
     id: number;
     author: string;
@@ -103,7 +107,7 @@ export const dummyPosts: Post[] = [
 ];
 
 function HomePage() {
-    const [posts, setPosts] = useState<Post[]>([]);
+    const [posts, setPosts] = useState<Post[]>([]); // Moved state to HomePage
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editPostId, setEditPostId] = useState<number | null>(null);
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -126,8 +130,9 @@ function HomePage() {
     };
 
     const handleEditPost = (postId: number) => {
-        setEditPostId(postId); // Set the post id being edited
+        setEditPostId(postId);
     };
+
     const handleEditPostSave = (postId: number, newTitle: string, newContent: string) => {
         const updatedPosts = posts.map(post => {
             if (post.id === postId) {
@@ -161,9 +166,8 @@ function HomePage() {
         closeModal();
     };
 
-
     return (
-        <div>
+        <div className="home-page-container"> {/* Apply the container class */}
             <h2>Home Page</h2>
             <button onClick={openModal}>Add Post</button>
             <ul>
@@ -172,19 +176,20 @@ function HomePage() {
                         <div>
                             <h3>{post.title}</h3>
                             <p>{post.content}</p>
-                            <div>
+                            <div className="author-info"> {/* Apply the author-info class */}
                                 <img src={post.author.photo} alt={post.author.name} />
                                 <p>{post.author.name}</p>
                                 <p>Account Type: {post.author.accountType}</p>
                                 <p>Comments: {post.comments.length}</p>
                             </div>
                             {currentUser && currentUser.role === UserRole.Admin && (
-                                <div>
+                                <div className="edit-remove-buttons">
                                     <button onClick={() => handleEditPost(post.id)}>Edit</button>
                                     <button onClick={() => handleConfirmRemovePost(post.id)}>Remove</button>
                                 </div>
                             )}
                             <Link to={`/${post.id}/comments`}>View Details</Link>
+                            <PostComments currentUserRole={currentUser?.role || ''} posts={posts} setPosts={setPosts} />
                         </div>
                     </li>
                 ))}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {UserRole} from "./Auth.tsx";
+import '../style/login-page.css'
 enum AuthMode {
     Login,
     Register,
@@ -70,7 +71,7 @@ function LoginPage() {
     };
 
     return (
-        <div>
+        <div className="login-container"> {/* Apply the CSS class */}
             <h2>{authMode === AuthMode.Login ? 'Login' : 'Register'}</h2>
             <form>
                 <div>

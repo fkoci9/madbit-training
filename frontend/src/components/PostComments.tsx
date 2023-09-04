@@ -20,14 +20,17 @@ interface Post {
     author: Author;
     comments: Comment[];
 }
-
-interface PostCommentsProps {
-    posts: Post[];
-    currentUserRole: User;
-    setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
+interface User {
+    role: 'Admin' | 'User'; // You can adjust the roles as needed
 }
 
-const PostComments: React.FC<PostCommentsProps> = ({ posts , currentUserRole , setPosts }) => {
+interface PostCommentsProps {
+    posts?: Post[];
+    currentUserRole: User;
+    setPosts: React.Dispatch<React.SetStateAction<Post[]>>; // Add setPosts prop
+}
+
+const PostComments: React.FC<PostCommentsProps> = ({ currentUserRole, posts = [], setPosts }) => {
     const { postId } = useParams<{ postId?: string }>();
     const [editedCommentId, setEditedCommentId] = useState<number | null>(null);
     const [editedCommentText, setEditedCommentText] = useState('');
@@ -39,7 +42,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ posts , currentUserRole , s
     };
 
     const handleSaveCommentEdit = (commentId: number) => {
-        const updatedPosts = posts.map(post => {
+        const updatedPosts = posts?.map(post => {
             if (post.id === parseInt(postId as string)) {
                 const updatedComments = post.comments.map(comment => {
                     if (comment.id === commentId) {
@@ -56,7 +59,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ posts , currentUserRole , s
         setEditedCommentText('');
     };
     const handleDeleteComment = (commentId: number) => {
-        const updatedPosts = posts.map(post => {
+        const updatedPosts = posts?.map(post => {
             if (post.id === parseInt(postId as string)) {
                 const updatedComments = post.comments.filter(comment => comment.id !== commentId);
                 return { ...post, comments: updatedComments };
@@ -73,7 +76,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ posts , currentUserRole , s
     }
 
     // Find the post with the matching postId
-    const post = posts.find(p => p.id === parseInt(postId));
+    const post = posts?.find(p => p.id === parseInt(postId));
 
     if (!post) {
         return <div>Post not found</div>;
@@ -97,7 +100,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ posts , currentUserRole , s
                         ) : (
                             <div>
                                 <strong>{comment.author}:</strong> {comment.text}
-                                {currentUserRole === 'Admin' && (
+                                {currentUserRole.role === 'Admin' && (
                                     <div>
                                         <button onClick={() => handleEditComment(comment.id, comment.text)}>Edit</button>
                                         <button onClick={() => handleDeleteComment(comment.id)}>Delete</button>
