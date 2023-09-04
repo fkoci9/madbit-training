@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../style/add-post.css';
 
 interface AddPostModalProps {
     onClose: () => void;
@@ -8,6 +9,7 @@ interface AddPostModalProps {
 function AddPostModal({ onClose, onAddPost }: AddPostModalProps) {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTitle(event.target.value);
@@ -22,8 +24,13 @@ function AddPostModal({ onClose, onAddPost }: AddPostModalProps) {
         onClose();
     };
 
+
+    const hideModal = () => {
+        setIsModalVisible(false);
+    };
+
     return (
-        <div className="modal">
+        <div className={`modal ${isModalVisible ? 'show' : ''}`}>
             <div className="modal-content">
                 <h2>Add Post</h2>
                 <div>
@@ -35,7 +42,7 @@ function AddPostModal({ onClose, onAddPost }: AddPostModalProps) {
                     <textarea value={content} onChange={handleContentChange} />
                 </div>
                 <button onClick={handleAddPost}>Add Post</button>
-                <button onClick={onClose}>Cancel</button>
+                <button onClick={() => { hideModal(); onClose(); }}>Cancel</button>
             </div>
         </div>
     );

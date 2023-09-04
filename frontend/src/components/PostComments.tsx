@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 import { useParams } from 'react-router-dom';
+import {UserRole} from './Auth.tsx'
+
 
 interface Comment {
     id: number;
@@ -20,21 +22,19 @@ interface Post {
     author: Author;
     comments: Comment[];
 }
-interface User {
-    role: 'Admin' | 'User'; // You can adjust the roles as needed
-}
 
 interface PostCommentsProps {
     posts?: Post[];
-    currentUserRole: User;
-    setPosts: React.Dispatch<React.SetStateAction<Post[]>>; // Add setPosts prop
+    currentUserRole: UserRole;
+    setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
 }
 
-const PostComments: React.FC<PostCommentsProps> = ({ currentUserRole, posts = [], setPosts }) => {
+const PostComments: React.FC<PostCommentsProps> = ({ currentUserRole, posts = [] , setPosts}) => {
     const { postId } = useParams<{ postId?: string }>();
     const [editedCommentId, setEditedCommentId] = useState<number | null>(null);
     const [editedCommentText, setEditedCommentText] = useState('');
 
+    console.log(currentUserRole)
 
     const handleEditComment = (commentId: number, initialText: string) => {
         setEditedCommentId(commentId);
@@ -70,19 +70,19 @@ const PostComments: React.FC<PostCommentsProps> = ({ currentUserRole, posts = []
     };
 
 
-    // Check if postId is undefined or not a valid number
+
     if (!postId || isNaN(parseInt(postId))) {
         return <div>Invalid postId</div>;
     }
 
-    // Find the post with the matching postId
+
     const post = posts?.find(p => p.id === parseInt(postId));
 
     if (!post) {
         return <div>Post not found</div>;
     }
 
-    // ...
+
     return (
         <div>
             <h2>{post.title} Comments</h2>
@@ -100,7 +100,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ currentUserRole, posts = []
                         ) : (
                             <div>
                                 <strong>{comment.author}:</strong> {comment.text}
-                                {currentUserRole.role === 'Admin' && (
+                                {currentUserRole === UserRole.Admin &&(
                                     <div>
                                         <button onClick={() => handleEditComment(comment.id, comment.text)}>Edit</button>
                                         <button onClick={() => handleDeleteComment(comment.id)}>Delete</button>
@@ -113,7 +113,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ currentUserRole, posts = []
             </ul>
         </div>
     );
-// ...
+
 
 };
 

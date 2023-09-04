@@ -2,9 +2,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './components/LoginPage';
 import HomePage from './components/HomePage';
 import PostComments from './components/PostComments.tsx';
+import {dummyPosts} from "./components/HomePage";
 
 function App() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
 
     return (
         <Router>
@@ -13,7 +15,7 @@ function App() {
                 {currentUser ? (
                     <>
                         <Route path="/home" element={<HomePage />} />
-                        <Route path="/:postId/comments" element={<PostComments  />} />
+                        <Route path="/:postId/comments" element={<PostComments posts={dummyPosts} currentUserRole={currentUser.role} />} />
                     </>
                 ) : (
                     <Route path="/" element={<Navigate to="/login" />} />

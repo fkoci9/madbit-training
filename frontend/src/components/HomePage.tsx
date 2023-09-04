@@ -6,7 +6,6 @@ import RemovePost from "./RemovePost.tsx";
 import avatar_147142 from '../assets/avatar_147142.png';
 import avatar_168732 from '../assets/avatar_168732.png'
 import { Link } from 'react-router-dom';
-import PostComments from "./PostComments.tsx";
 import '../style/home-page.css'
 
 
@@ -189,7 +188,7 @@ function HomePage() {
                                 </div>
                             )}
                             <Link to={`/${post.id}/comments`}>View Details</Link>
-                            <PostComments currentUserRole={currentUser?.role || ''} posts={posts} setPosts={setPosts} />
+
                         </div>
                     </li>
                 ))}
