@@ -34,7 +34,6 @@ const PostComments: React.FC<PostCommentsProps> = ({ currentUserRole, posts = []
     const [editedCommentId, setEditedCommentId] = useState<number | null>(null);
     const [editedCommentText, setEditedCommentText] = useState('');
 
-    console.log(currentUserRole)
 
     const handleEditComment = (commentId: number, initialText: string) => {
         setEditedCommentId(commentId);
@@ -54,6 +53,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ currentUserRole, posts = []
             }
             return post;
         });
+        console.log(post)
         setPosts(updatedPosts);
         setEditedCommentId(null);
         setEditedCommentText('');

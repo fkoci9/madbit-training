@@ -1,11 +1,11 @@
 import {useEffect, useState} from 'react';
 import AddPostModal from './AddPostModal';
 import EditPost from "./EditPost.tsx";
-import {UserRole} from './Auth.tsx'
+
 import RemovePost from "./RemovePost.tsx";
 import avatar_147142 from '../assets/avatar_147142.png';
 import avatar_168732 from '../assets/avatar_168732.png'
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import '../style/home-page.css'
 
 
@@ -27,6 +27,11 @@ interface Post {
     content: string;
     author: Author;
     comments: Comment[];
+}
+
+interface User {
+    email: string;
+    password: string;
 }
 
 export const dummyPosts: Post[] = [
@@ -106,15 +111,19 @@ export const dummyPosts: Post[] = [
 ];
 
 function HomePage() {
-    const [posts, setPosts] = useState<Post[]>([]); // Moved state to HomePage
+    const [posts, setPosts] = useState<Post[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editPostId, setEditPostId] = useState<number | null>(null);
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [removePostId, setRemovePostId] = useState<number | null>(null);
 
+    const navigate = useNavigate();
     useEffect(() => {
         const savedPosts = JSON.parse(localStorage.getItem('posts') || JSON.stringify(dummyPosts));
         setPosts(savedPosts);
+
+        const storedUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        setCurrentUser(storedUser);
     }, []);
 
     useEffect(() => {
@@ -165,49 +174,70 @@ function HomePage() {
         closeModal();
     };
 
-    return (
-        <div className="home-page-container"> {/* Apply the container class */}
-            <h2>Home Page</h2>
-            <button onClick={openModal}>Add Post</button>
-            <ul>
-                {posts.map(post => (
-                    <li key={post.id}>
-                        <div>
-                            <h3>{post.title}</h3>
-                            <p>{post.content}</p>
-                            <div className="author-info"> {/* Apply the author-info class */}
-                                <img src={post.author.photo} alt={post.author.name} />
-                                <p>{post.author.name}</p>
-                                <p>Account Type: {post.author.accountType}</p>
-                                <p>Comments: {post.comments.length}</p>
-                            </div>
-                            {currentUser && currentUser.role === UserRole.Admin && (
-                                <div className="edit-remove-buttons">
-                                    <button onClick={() => handleEditPost(post.id)}>Edit</button>
-                                    <button onClick={() => handleConfirmRemovePost(post.id)}>Remove</button>
-                                </div>
-                            )}
-                            <Link to={`/${post.id}/comments`}>View Details</Link>
+    const handleLogout = () => {
+        navigate('./');
+        localStorage.removeItem('currentUser');
+        setCurrentUser(null);
+    };
 
+    return (
+        <div>
+            <nav className="navbar">
+                <div className="navbar-left">
+                    HomePage
+                </div>
+                <div className="navbar-center"></div>
+                <div className="navbar-right">
+                    {currentUser && (
+                        <div className="user-info">
+                            {currentUser.email}
+                            <button onClick={handleLogout}>Logout</button>
                         </div>
-                    </li>
-                ))}
-            </ul>
-            {isModalOpen && <AddPostModal onClose={closeModal} onAddPost={handleAddPost} />}
-            {editPostId !== null && (
-                <EditPost
-                    postId={editPostId}
-                    onClose={() => setEditPostId(null)}
-                    onEditPost={handleEditPostSave}
-                />
-            )}
-            {removePostId !== null && (
-                <RemovePost
-                    postId={removePostId}
-                    onClose={() => setRemovePostId(null)}
-                    onConfirmRemove={handleConfirmRemovePost}
-                />
-            )}
+                    )}
+                </div>
+            </nav>
+            <div className="home-page-container">
+                <h2>Home Page</h2>
+                <button onClick={openModal}>Add Post</button>
+                <ul>
+                    {posts.map(post => (
+                        <li key={post.id}>
+                            <div>
+                                <h3>{post.title}</h3>
+                                <p>{post.content}</p>
+                                <div className="author-info">
+                                    <img src={post.author.photo} alt={post.author.name} />
+                                    <p>{post.author.name}</p>
+                                    <p>Account Type: {post.author.accountType}</p>
+                                    <p>Comments: {post.comments.length}</p>
+                                </div>
+                                {currentUser && (
+                                    <div className="edit-remove-buttons">
+                                        <button onClick={() => handleEditPost(post.id)}>Edit</button>
+                                        <button onClick={() => setRemovePostId(post.id)}>Remove</button>
+                                    </div>
+                                )}
+                                <Link to={`/${post.id}/comments`}>View Details</Link>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+                {isModalOpen && <AddPostModal onClose={closeModal} onAddPost={handleAddPost} />}
+                {editPostId !== null && (
+                    <EditPost
+                        postId={editPostId}
+                        onClose={() => setEditPostId(null)}
+                        onEditPost={handleEditPostSave}
+                    />
+                )}
+                {removePostId !== null && (
+                    <RemovePost
+                        postId={removePostId}
+                        onClose={() => setRemovePostId(null)}
+                        onConfirmRemove={handleConfirmRemovePost}
+                    />
+                )}
+            </div>
         </div>
     );
 }

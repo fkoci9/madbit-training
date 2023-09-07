@@ -23,6 +23,7 @@ function EditPost({ postId, onClose, onEditPost }: EditPostModalProps) {
     const handleSubmit = () => {
         onEditPost(postId, newTitle, newContent);
         onClose();
+        setIsModalVisible(false);
     };
 
     return (
