@@ -1,245 +1,117 @@
-import {useEffect, useState} from 'react';
-import AddPostModal from './AddPostModal';
-import EditPost from "./EditPost.tsx";
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../redux/store.tsx';
+import {editPost, removePost, setPosts} from '../redux/postSlice.tsx';
+import AddPost from './AddPost.tsx';
+import EditPost from './EditPost.tsx';
+import {dummyPosts} from "./dummyData.tsx";
 
-import RemovePost from "./RemovePost.tsx";
-import avatar_147142 from '../assets/avatar_147142.png';
-import avatar_168732 from '../assets/avatar_168732.png'
-import {Link, useNavigate} from 'react-router-dom';
-import '../style/home-page.css'
+const loadPostsFromLocalStorage = () => {
+    return JSON.parse(localStorage.getItem('posts') || '[]');
+};
 
+const savePostsToLocalStorage = (posts: any) => {
+    localStorage.setItem('posts', JSON.stringify(posts));
+};
 
-interface Comment {
-    id: number;
-    author: string;
-    text: string;
-}
+const HomePage: React.FC = () => {
+    const dispatch = useDispatch();
+    const posts = useSelector((state: RootState) => state.posts.posts);
 
-interface Author {
-    name: string;
-    accountType: string;
-    photo: string;
-}
-
-interface Post {
-    id: number;
-    title: string;
-    content: string;
-    author: Author;
-    comments: Comment[];
-}
-
-interface User {
-    email: string;
-    password: string;
-}
-
-export const dummyPosts: Post[] = [
-    {
-        id: 1,
-        title: 'First Post',
-        content: 'This is the content of the first post.',
-        author: {
-            name: 'John Doe',
-            accountType: 'Premium',
-            photo: avatar_147142,
-        },
-        comments: [
-            { id: 1, author: 'Alice', text: 'Great post!' },
-            { id: 2, author: 'Bob', text: 'I agree.' },
-            { id: 3, author: 'John', text: 'Super' },
-        ],
-    },
-    {
-        id: 2,
-        title: 'Second Post',
-        content: 'This is the content of the second post.',
-        author: {
-            name: 'Jane Smith',
-            accountType: 'Basic',
-            photo: avatar_168732, // Replace with actual file path
-        },
-        comments: [
-            { id: 1, author: 'Alice', text: 'Great post!' },
-        ],
-    },
-    {
-        id: 3,
-        title: 'Third Post',
-        content: 'This is the content of the third post.',
-        author: {
-            name: 'Alice Johnson',
-            accountType: 'Premium',
-            photo: avatar_147142, // Replace with actual file path
-        },
-        comments: [
-            { id: 2, author: 'Bob', text: 'I agree.' },
-        ],
-    },
-    {
-        id: 4,
-        title: 'Fourth Post',
-        content: 'This is the content of the fourth post.',
-        author: {
-            name: 'Bob Brown',
-            accountType: 'Basic',
-            photo: avatar_168732, // Replace with actual file path
-        },
-        comments: [
-            { id: 1, author: 'Alice', text: 'Great post!' },
-            { id: 2, author: 'Bob', text: 'I agree.' },
-            { id: 3, author: 'John', text: 'Super' },
-            { id: 4, author: 'Fabjo', text: 'So Cool!' },
-            { id: 5, author: 'Rei', text: 'I agree.' },
-            { id: 6, author: 'Marxhes', text: 'I dont agree with it' },
-            { id: 7, author: 'Inis', text: 'I agree.' },
-        ],
-    },
-    {
-        id: 5,
-        title: 'Fifth Post',
-        content: 'This is the content of the fifth post.',
-        author: {
-            name: 'Eve White',
-            accountType: 'Premium',
-            photo: avatar_147142, // Replace with actual file path
-        },
-        comments: [
-            { id: 2, author: 'Bob', text: 'I agree.' },
-        ],
-    },
-];
-
-function HomePage() {
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editPostId, setEditPostId] = useState<number | null>(null);
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [removePostId, setRemovePostId] = useState<number | null>(null);
-
-    const navigate = useNavigate();
-    useEffect(() => {
-        const savedPosts = JSON.parse(localStorage.getItem('posts') || JSON.stringify(dummyPosts));
-        setPosts(savedPosts);
-
-        const storedUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-        setCurrentUser(storedUser);
-    }, []);
+    const [editingPostId, setEditingPostId] = useState<number | null>(null); // Track the post being edited
+    const [updatedPost, setUpdatedPost] = useState({ title: '', author: '' });
 
     useEffect(() => {
-        localStorage.setItem('posts', JSON.stringify(posts));
-    }, [posts]);
+        // Load posts from local storage when the component initializes
+        const loadedPosts = loadPostsFromLocalStorage();
 
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
+        // If there are no posts in local storage, use the dummyPosts as initial data
+        if (loadedPosts.length === 0) {
+            dispatch(setPosts(dummyPosts));
+            savePostsToLocalStorage(dummyPosts);
+        } else {
+            dispatch(setPosts(loadedPosts));
+        }
+    }, [dispatch]);
+    const handleAddPost = (newPost: { title: string; author: string }) => {
+        // Implement logic to add a new post
+        // For an admin, you can directly add a new post to the posts array
+        const adminNewPost = { ...newPost, id: posts.length + 1 };
+        const updatedPosts = [adminNewPost, ...posts];
+        dispatch(setPosts(updatedPosts));
 
-    const handleEditPost = (postId: number) => {
-        setEditPostId(postId);
-    };
-
-    const handleEditPostSave = (postId: number, newTitle: string, newContent: string) => {
-        const updatedPosts = posts.map(post => {
-            if (post.id === postId) {
-                return { ...post, title: newTitle, content: newContent };
-            }
-            return post;
-        });
-        setPosts(updatedPosts);
-        setEditPostId(null);
+        // Save posts to local storage
+        savePostsToLocalStorage(updatedPosts);
     };
 
-    const handleConfirmRemovePost = (postId: number) => {
-        const updatedPosts = posts.filter(post => post.id !== postId);
-        setPosts(updatedPosts);
-        setRemovePostId(null);
+    const handleRemovePost = (postId: number) => {
+        // Dispatch the removePost action with the postId
+        dispatch(removePost(postId));
+
+        // Update local storage after removing a post
+        const updatedPosts = posts.filter((post) => post.id !== postId);
+        savePostsToLocalStorage(updatedPosts);
     };
 
-    const handleAddPost = (title: string, content: string) => {
-        const newPost: Post = {
-            id: Date.now(),
-            title,
-            content,
-            author: {
-                name: 'John Doe',
-                accountType: 'Premium',
-                photo: avatar_147142
-            },
-            comments: [],
-        };
-        setPosts([...posts, newPost]);
-        closeModal();
+    const handleEditPost = (postId: number, updatedTitle: string, updatedAuthor: string) => {
+        // Find the post by its id
+        const postToEdit = posts.find((post) => post.id === postId);
+
+        if (postToEdit) {
+            // Create an updated post object with the new title and author
+            const updatedPost = {
+                ...postToEdit,
+                title: updatedTitle,
+                author: updatedAuthor,
+            };
+
+            // Dispatch the editPost action with the postId and updatedPost
+            dispatch(editPost({ id: postId, updatedPost }));
+            setEditingPostId(null); // Exit edit mode after saving
+        }
     };
 
-    const handleLogout = () => {
-        navigate('./');
-        localStorage.removeItem('currentUser');
-        setCurrentUser(null);
+
+    const handleSaveEdit = () => {
+        // Dispatch the editPost action with the postId and updatedPost
+        if (editingPostId !== null) {
+            dispatch(editPost({ id: editingPostId, updatedPost }));
+            setEditingPostId(null); // Exit edit mode after saving
+        }
     };
+
+    const handleCancelEdit = () => {
+        // Cancel edit mode and reset the updatedPost
+        setEditingPostId(null);
+        setUpdatedPost({ title: '', author: '' });
+    };
+
 
     return (
         <div>
-            <nav className="navbar">
-                <div className="navbar-left">
-                    HomePage
-                </div>
-                <div className="navbar-center"></div>
-                <div className="navbar-right">
-                    {currentUser && (
-                        <div className="user-info">
-                            {currentUser.email}
-                            <button onClick={handleLogout}>Logout</button>
-                        </div>
-                    )}
-                </div>
-            </nav>
-            <div className="home-page-container">
-                <h2>Home Page</h2>
-                <button onClick={openModal}>Add Post</button>
-                <ul>
-                    {posts.map(post => (
-                        <li key={post.id}>
-                            <div>
-                                <h3>{post.title}</h3>
-                                <p>{post.content}</p>
-                                <div className="author-info">
-                                    <img src={post.author.photo} alt={post.author.name} />
-                                    <p>{post.author.name}</p>
-                                    <p>Account Type: {post.author.accountType}</p>
-                                    <p>Comments: {post.comments.length}</p>
-                                </div>
-                                {currentUser && (
-                                    <div className="edit-remove-buttons">
-                                        <button onClick={() => handleEditPost(post.id)}>Edit</button>
-                                        <button onClick={() => setRemovePostId(post.id)}>Remove</button>
-                                    </div>
-                                )}
-                                <Link to={`/${post.id}/comments`}>View Details</Link>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-                {isModalOpen && <AddPostModal onClose={closeModal} onAddPost={handleAddPost} />}
-                {editPostId !== null && (
-                    <EditPost
-                        postId={editPostId}
-                        onClose={() => setEditPostId(null)}
-                        onEditPost={handleEditPostSave}
-                    />
-                )}
-                {removePostId !== null && (
-                    <RemovePost
-                        postId={removePostId}
-                        onClose={() => setRemovePostId(null)}
-                        onConfirmRemove={handleConfirmRemovePost}
-                    />
-                )}
-            </div>
+            <h1>Home Page</h1>
+            <AddPost onAddPost={handleAddPost} />
+            <ul>
+                {posts.map((post) => (
+                    <li key={post.id}>
+                        {editingPostId === post.id ? ( // Render edit fields only for the editing post
+                            <>
+                                <EditPost onEditPost={handleSaveEdit} /> {/* Render the EditPost component */}
+                                <button onClick={handleCancelEdit}>Cancel</button>
+                            </>
+                        ) : (
+                            <>
+                                <h2>{post.title}</h2>
+                                <p>Author: {post.author}</p>
+                                <button onClick={() => handleRemovePost(post.id)}>Remove</button>
+                                <button onClick={() => handleEditPost(post.id)}>Edit</button>
+                            </>
+                        )}
+                    </li>
+                ))}
+            </ul>
         </div>
     );
-}
+};
 
 export default HomePage;

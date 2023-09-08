@@ -1,27 +1,21 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+// src/App.tsx
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // Import necessary components for React Router v6
 import LoginPage from './components/LoginPage';
-import HomePage from './components/HomePage';
-import PostComments from './components/PostComments.tsx';
-import {dummyPosts} from "./components/HomePage";
+import HomePage from './components/HomePage'; // Import HomePage component
+import { Provider } from 'react-redux';
+import store from './redux/store'; // Import your Redux store
 
 function App() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-
-
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<LoginPage />} />
-                {currentUser ? (
-                    <>
-                        <Route path="/home" element={<HomePage />} />
-                        <Route path="/:postId/comments" element={<PostComments posts={dummyPosts} currentUserRole={currentUser.role} />} />
-                    </>
-                ) : (
-                    <Route path="/" element={<Navigate to="/login" />} />
-                )}
-            </Routes>
-        </Router>
+        <Provider store={store}>
+            <Router>
+                <Routes>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/home" element={<HomePage />} />
+                    <Route path="/" element={<Navigate to="/login" replace />} />
+                </Routes>
+            </Router>
+        </Provider>
     );
 }
 

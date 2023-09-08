@@ -1,48 +1,35 @@
+// src/components/EditPost.tsx
+
 import React, { useState } from 'react';
-import '../style/add-post.css'
 
-interface EditPostModalProps {
-    postId: number;
-    onClose: () => void;
-    onEditPost: (postId: number, newTitle: string, newContent: string) => void;
-}
+const EditPost: React.FC<{ onEditPost: (updatedPost: { title: string; author: string }) => void }> = ({
+                                                                                                          onEditPost,
+                                                                                                      }) => {
+    const [updatedPost, setUpdatedPost] = useState({ title: '', author: '' });
 
-function EditPost({ postId, onClose, onEditPost }: EditPostModalProps) {
-    const [newTitle, setNewTitle] = useState('');
-    const [newContent, setNewContent] = useState('');
-    const [isModalVisible, setIsModalVisible] = useState(true);
-
-    const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setNewTitle(event.target.value);
-    };
-
-    const handleContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setNewContent(event.target.value);
-    };
-
-    const handleSubmit = () => {
-        onEditPost(postId, newTitle, newContent);
-        onClose();
-        setIsModalVisible(false);
+    const handleEditPost = () => {
+        onEditPost(updatedPost);
+        setUpdatedPost({ title: '', author: '' });
     };
 
     return (
-        <div className={`modal ${isModalVisible ? 'show' : ''}`}>
-            <div className="modal-content">
-                <h2>Edit Post</h2>
-                <div>
-                    <label>Title:</label>
-                    <input type="text" value={newTitle} onChange={handleTitleChange} />
-                </div>
-                <div>
-                    <label>Content:</label>
-                    <textarea value={newContent} onChange={handleContentChange} />
-                </div>
-                <button onClick={handleSubmit}>Save</button>
-                <button onClick={onClose}>Cancel</button>
-            </div>
+        <div>
+            <h2>Edit Post</h2>
+            <input
+                type="text"
+                placeholder="New Title"
+                value={updatedPost.title}
+                onChange={(e) => setUpdatedPost({ ...updatedPost, title: e.target.value })}
+            />
+            <input
+                type="text"
+                placeholder="New Author"
+                value={updatedPost.author}
+                onChange={(e) => setUpdatedPost({ ...updatedPost, author: e.target.value })}
+            />
+            <button onClick={handleEditPost}>Edit</button>
         </div>
     );
-}
+};
 
 export default EditPost;

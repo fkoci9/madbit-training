@@ -1,23 +1,14 @@
-interface RemovePostProps {
-    postId: number;
-    onClose: () => void;
-    onConfirmRemove: (postId: number) => void;
-}
+// src/components/RemovePost.tsx
 
-function RemovePost({ postId, onClose, onConfirmRemove }: RemovePostProps) {
-    const handleConfirm = () => {
-        onConfirmRemove(postId);
-        onClose();
-    };
+import React from 'react';
 
+const RemovePost: React.FC<{ onRemovePost: () => void }> = ({ onRemovePost }) => {
     return (
-        <div className="remove-post-modal">
-            <h3>Confirm Removal</h3>
-            <p>Are you sure you want to remove this post?</p>
-            <button onClick={handleConfirm}>Remove</button>
-            <button onClick={onClose}>Cancel</button>
+        <div>
+            <h2>Remove Post</h2>
+            <button onClick={onRemovePost}>Remove</button>
         </div>
     );
-}
+};
 
 export default RemovePost;
