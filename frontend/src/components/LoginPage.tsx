@@ -1,10 +1,7 @@
-// src/LoginPage.tsx
-
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {loginUser} from "../redux/authActions.tsx";
 import {useNavigate} from "react-router-dom";
-
 
 const LoginPage: React.FC = () => {
     const dispatch = useDispatch();
@@ -12,14 +9,14 @@ const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [isRegistering, setIsRegistering] = useState(false); // Track registration state
+    const [isRegistering, setIsRegistering] = useState(false);
     const [registrationEmail, setRegistrationEmail] = useState('');
     const [registrationPassword, setRegistrationPassword] = useState('');
 
     if (!localStorage.getItem('users')) {
         const adminUser = {
             email: '1',
-            password: '1', // You should hash and salt passwords in a real application
+            password: '1',
             type: 'admin',
         };
         localStorage.setItem('users', JSON.stringify([adminUser]));
@@ -34,7 +31,7 @@ const LoginPage: React.FC = () => {
             localStorage.setItem('currentUser' , JSON.stringify(user));
             // @ts-ignore
             dispatch(loginUser());
-            navigate('/home'); // Navigate to HomePage on successful login
+            navigate('/home');
         } else {
             setError('Invalid email or password');
         }
@@ -45,7 +42,7 @@ const LoginPage: React.FC = () => {
         const newUser = {
             email: registrationEmail,
             password: registrationPassword,
-            type: 'user', // Set the user type to 'user'
+            type: 'user',
         };
 
         storedUsers.push(newUser);

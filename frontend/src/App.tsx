@@ -1,9 +1,10 @@
-// src/App.tsx
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // Import necessary components for React Router v6
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
-import HomePage from './components/HomePage'; // Import HomePage component
+import HomePage from './components/HomePage';
+import CommentPage from './components/CommentPage.tsx';
 import { Provider } from 'react-redux';
-import store from './redux/store'; // Import your Redux store
+import store from './redux/store';
+import {dummyPosts} from "./components/dummyData.tsx";
 
 function App() {
     return (
@@ -11,7 +12,8 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/login" element={<LoginPage />} />
-                    <Route path="/home" element={<HomePage />} />
+                    <Route path="/home" element={<HomePage posts={dummyPosts}/>} />
+                    <Route path="/comments/:postId" element={<CommentPage posts={dummyPosts}/>} />
                     <Route path="/" element={<Navigate to="/login" replace />} />
                 </Routes>
             </Router>

@@ -1,15 +1,17 @@
-// src/components/EditPost.tsx
-
 import React, { useState } from 'react';
+interface EditPostProps {
+    postId: number;
+    title: string;
+    author: string;
+    onEditPost: (postId: number, updatedTitle: string, updatedAuthor: string) => void;
+}
 
-const EditPost: React.FC<{ onEditPost: (updatedPost: { title: string; author: string }) => void }> = ({
-                                                                                                          onEditPost,
-                                                                                                      }) => {
-    const [updatedPost, setUpdatedPost] = useState({ title: '', author: '' });
+const EditPost: React.FC<EditPostProps> = ({ postId, title, author, onEditPost }) => {
+    const [updatedTitle, setUpdatedTitle] = useState(title);
+    const [updatedAuthor, setUpdatedAuthor] = useState(author);
 
     const handleEditPost = () => {
-        onEditPost(updatedPost);
-        setUpdatedPost({ title: '', author: '' });
+        onEditPost(postId, updatedTitle, updatedAuthor);
     };
 
     return (
@@ -18,16 +20,16 @@ const EditPost: React.FC<{ onEditPost: (updatedPost: { title: string; author: st
             <input
                 type="text"
                 placeholder="New Title"
-                value={updatedPost.title}
-                onChange={(e) => setUpdatedPost({ ...updatedPost, title: e.target.value })}
+                value={updatedTitle}
+                onChange={(e) => setUpdatedTitle(e.target.value)}
             />
             <input
                 type="text"
                 placeholder="New Author"
-                value={updatedPost.author}
-                onChange={(e) => setUpdatedPost({ ...updatedPost, author: e.target.value })}
+                value={updatedAuthor}
+                onChange={(e) => setUpdatedAuthor(e.target.value)}
             />
-            <button onClick={handleEditPost}>Edit</button>
+            <button onClick={handleEditPost}>Save</button>
         </div>
     );
 };
