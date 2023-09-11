@@ -1,76 +1,35 @@
-import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/store.tsx';
-import {editPost, removePost, setPosts} from '../redux/postSlice.tsx';
-import AddPost from './AddPost.tsx';
-import EditPost from './EditPost.tsx';
-import {logout} from "../redux/authSlice.tsx";
-import {useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/store.tsx';
+import { editPost, removePost, addPost } from '../redux/postSlice.tsx';
+import { logout } from "../redux/authSlice.tsx";
+import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 
-const loadPostsFromLocalStorage = () => {
-    return JSON.parse(localStorage.getItem('posts') || '[]');
-};
-
-const savePostsToLocalStorage = (posts: any) => {
-    localStorage.setItem('posts', JSON.stringify(posts));
-};
-interface Props {
-    posts: {
-        id: number;
-        title: string;
-        author: string;
-        comments: { id: number; title: string }[];
-    }[];
-}
-
-const HomePage: React.FC<Props> = (props) => {
+const HomePage: React.FC = () => {
     const dispatch = useDispatch();
-    const posts = useSelector((state: RootState) => state.posts.posts);
+    const posts = useSelector((state: RootState) => state.app.posts);
+    console.log(posts);
     const navigate = useNavigate();
     const [editingPostId, setEditingPostId] = useState<number | null>(null);
 
     useEffect(() => {
-
-        const loadedPosts = loadPostsFromLocalStorage();
-        if (loadedPosts.length === 0) {
-            dispatch(setPosts(props.posts));
-            savePostsToLocalStorage(props.posts);
-        } else {
-            dispatch(setPosts(loadedPosts));
+        if (posts.length === 0) {
+            dispatch(addPost(posts));
         }
-    }, [dispatch , props.posts]);
-    const handleAddPost = (newPost: { title: string; author: string }) => {
-        const maxId = Math.max(...posts.map((post) => post.id), 0);
-        const adminNewPost = { ...newPost, id: maxId + 1 };
-        const updatedPosts = [adminNewPost, ...posts];
-        dispatch(setPosts(updatedPosts));
-        savePostsToLocalStorage(updatedPosts);
-    };
+    }, [dispatch, posts]);
 
     const handleRemovePost = (postId: number) => {
         dispatch(removePost(postId));
-        const updatedPosts = posts.filter((post) => post.id !== postId);
-        savePostsToLocalStorage(updatedPosts);
     };
 
-    const handleEditPost = (postId: number, updatedTitle: string, updatedAuthor: string) => {
-        const postToEdit = posts.find((post) => post.id === postId);
+    const handleEditPost = (postId: number) => {
+        setEditingPostId(postId);
+    };
 
-        if (postToEdit) {
-            const updatedPost = {
-                ...postToEdit,
-                title: updatedTitle,
-                author: updatedAuthor,
-            };
-
-            dispatch(editPost({ id: postId, updatedPost }));
-            const updatedPosts = posts.map((post) =>
-                post.id === postId ? { ...post, title: updatedTitle, author: updatedAuthor } : post
-            );
-            savePostsToLocalStorage(updatedPosts);
-            setEditingPostId(null);
-        }
+    const handleSavePost = (postId: number, updatedContent: string) => {
+        dispatch(editPost({ postId, updatedContent }));
+        setEditingPostId(null);
     };
 
     const handleCancelEdit = () => {
@@ -90,18 +49,19 @@ const HomePage: React.FC<Props> = (props) => {
         <div>
             <h1>Home Page</h1>
             <button onClick={handleLogout}>Log Out</button>
-            <AddPost onAddPost={handleAddPost} />
+
             <ul>
                 {posts.map((post) => (
                     <li key={post.id}>
                         {currentUserType === 'admin' && editingPostId === post.id ? (
                             <>
-                                <EditPost
-                                    postId={post.id}
-                                    title={post.title}
-                                    author={post.author}
-                                    onEditPost={handleEditPost}
-                                />
+                                <div>
+                                    <input
+                                        type="text"
+                                        value={post.title}
+                                        onChange={(e) => handleSavePost(post.id, e.target.value)}
+                                    />
+                                </div>
                                 <button onClick={handleCancelEdit}>Cancel</button>
                             </>
                         ) : null}
@@ -110,7 +70,7 @@ const HomePage: React.FC<Props> = (props) => {
                         {currentUserType === 'admin' ? (
                             <>
                                 <button onClick={() => handleRemovePost(post.id)}>Remove</button>
-                                <button onClick={() => setEditingPostId(post.id)}>Edit</button>
+                                <button onClick={() => handleEditPost(post.id)}>Edit</button>
                                 <Link to={`/comments/${post.id}`}>View Comments</Link>
                             </>
                         ) : null}

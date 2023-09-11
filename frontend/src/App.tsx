@@ -4,7 +4,7 @@ import HomePage from './components/HomePage';
 import CommentPage from './components/CommentPage.tsx';
 import { Provider } from 'react-redux';
 import store from './redux/store';
-import {dummyPosts} from "./components/dummyData.tsx";
+
 
 function App() {
     return (
@@ -12,8 +12,8 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/login" element={<LoginPage />} />
-                    <Route path="/home" element={<HomePage posts={dummyPosts}/>} />
-                    <Route path="/comments/:postId" element={<CommentPage posts={dummyPosts}/>} />
+                    <Route path="/home" element={<HomePage />} />
+                    <Route path="/comments/:postId" element={<CommentPage />} />
                     <Route path="/" element={<Navigate to="/login" replace />} />
                 </Routes>
             </Router>
