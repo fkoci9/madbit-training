@@ -22,10 +22,10 @@ const HomePage: React.FC = () => {
         }
     }, [dispatch, posts]);
 
-    const handleAddPost = () => {
+    const handleAddPost = (newPost: {title:string , author:string}) => {
         dispatch(addNewPost(newPost));
         setIsModalOpen(false); // Close the modal after adding a new post
-        setNewPost({ title: '', author: '' }); // Clear input fields
+        setNewPost({ title : '', author: ''}); // Clear input fields
     };
 
     const handleRemovePost = (postId: number) => {
@@ -94,7 +94,7 @@ const HomePage: React.FC = () => {
                                     />
                                 </div>
                             </div>
-                            <button className="button is-primary" onClick={handleAddPost}>
+                            <button className="button is-primary" onClick={() => handleAddPost(newPost)}>
                                 Add Post
                             </button>
                         </div>
@@ -103,7 +103,7 @@ const HomePage: React.FC = () => {
                         className="modal-close is-large"
                         aria-label="close"
                         onClick={() => setIsModalOpen(false)}
-                    ></button>
+                    >Cancel</button>
                 </div>
             )}
             <ul>

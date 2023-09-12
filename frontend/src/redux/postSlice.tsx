@@ -48,10 +48,11 @@ interface AppState {
     posts: Post[];
     comments: Comment[];
 }
-
-const initialState: AppState = {
+const LOCAL_STORAGE_KEY = 'reduxState';
+const storedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+const initialState: AppState = storedState ? JSON.parse(storedState) : {
     posts: dummyPosts,
-    comments: [],
+    comments : [],
 };
 
 const appSlice = createSlice({
@@ -60,6 +61,7 @@ const appSlice = createSlice({
     reducers: {
         addPost: (state, action) => {
             state.posts.push(action.payload);
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
         },
         addNewPost: (state, action) =>{
             const newPost: Post = {
@@ -69,10 +71,13 @@ const appSlice = createSlice({
                 comments: [],
             };
             state.posts.push(newPost);
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+
         },
         removePost: (state, action) => {
             const postId = action.payload;
             state.posts = state.posts.filter(post => post.id !== postId);
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
         },
         editPost: (state, action) =>{
             const { postId, updatedContent} = action.payload;
@@ -86,28 +91,20 @@ const appSlice = createSlice({
 
                 const index = state.posts.indexOf(post);
                 state.posts[index] =  updatedPost;
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
             }
         },
         addComment : (state , action) =>{
             state.comments.push(action.payload);
         },
         addNewComment: (state, action) => {
-            const { postId, text } = action.payload;
-            const post = state.posts.find((post) => post.id === postId);
-
-            if (post) {
-                const updatedPost = {
-                    ...post,
-                    comments: [
-                        ...post.comments,
-                        { id: post.comments.length + 1, text, author: 'Current User' },
-                    ],
-                };
-
-                const index = state.posts.indexOf(post);
-                // @ts-ignore
-                state.posts[index] = updatedPost;
-            }
+            const newComment: Comment = {
+                id: action.payload.id + 1,
+                postId : action.payload.postId,
+                title: action.payload.title,
+            };
+            // @ts-ignore
+            state.comments[0].push(newComment);
         },
     },
 });
