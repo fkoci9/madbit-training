@@ -47,8 +47,8 @@ const dummyPosts:Post[] = [
 
 interface AppState {
     posts: Post[];
-    comments: Comment[];
 }
+
 const LOCAL_STORAGE_KEY = 'reduxState';
 const storedState = localStorage.getItem(LOCAL_STORAGE_KEY);
 const initialState: AppState = storedState ? JSON.parse(storedState) : {
@@ -59,11 +59,6 @@ const appSlice = createSlice({
     name: 'app',
     initialState,
     reducers: {
-        addPost: (state, action) => {
-            state.posts.push(action.payload);
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
-        },
-
 
         addNewPost: (state, action) =>{
             const newPost: Post = {
@@ -96,9 +91,7 @@ const appSlice = createSlice({
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
             }
         },
-        addComment : (state , action) =>{
-            state.comments.push(action.payload);
-        },
+
         addNewComment: (state, action) => {
             const { postId, title } = action.payload;
             const selectedPostIndex = state.posts.findIndex((post) => post.id === postId);
@@ -129,11 +122,10 @@ const appSlice = createSlice({
 });
 
 export const {
-    addPost,
+
     addNewPost,
     removePost,
     editPost,
-    addComment,
     addNewComment,
     removeComment,
 } = appSlice.actions;

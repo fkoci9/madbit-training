@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store.tsx';
-import { editPost, removePost, addPost , addNewPost } from '../redux/postSlice.tsx';
+import { editPost, removePost, addNewPost } from '../redux/postSlice.tsx';
 import { logout } from "../redux/authSlice.tsx";
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
@@ -32,12 +32,6 @@ const HomePage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newPost, setNewPost] = useState({ title: '', author: '' });
     const [editedTitle, setEditedTitle] = useState('');
-
-    useEffect(() => {
-        if (posts.length === 0) {
-            dispatch(addPost(posts));
-        }
-    }, [dispatch, posts]);
 
     const handleAddPost = (newPost: {title:string , author:string}) => {
         dispatch(addNewPost(newPost));

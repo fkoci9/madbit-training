@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
-import {addComment, addNewComment, removeComment} from '../redux/postSlice.tsx'; // Assuming you have a Comment type in your postSlice.tsx
+import {addNewComment, removeComment} from '../redux/postSlice.tsx'; // Assuming you have a Comment type in your postSlice.tsx
 import { RootState } from '../redux/store';
 import { useParams } from 'react-router-dom';
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 
 const CommentPage: React.FC = () => {
     const { postId } = useParams();
@@ -15,14 +15,10 @@ const CommentPage: React.FC = () => {
     const comments = useSelector((state: RootState) => state.app.posts[selectedPostIndex].comments);
     console.log('comments' , comments)
 
-    useEffect(()=>{
-        if(comments.length === 0){
-            dispatch(addComment(comments));
-        }
-    },[dispatch, comments])
     const handleAddComment = () => {
-        const commentToAdd = { postId: postId, title: newComment.title };
+        const commentToAdd = { postId: Number(postId), title: newComment.title };
         dispatch(addNewComment(commentToAdd));
+        console.log(commentToAdd)
         setIsModalOpen(false);
         setNewComment({ title: '' });
     }
