@@ -1,5 +1,6 @@
 import { createSlice} from '@reduxjs/toolkit';
 
+
 export interface Comment {
     id: number;
     postId : number;
@@ -52,7 +53,6 @@ const LOCAL_STORAGE_KEY = 'reduxState';
 const storedState = localStorage.getItem(LOCAL_STORAGE_KEY);
 const initialState: AppState = storedState ? JSON.parse(storedState) : {
     posts: dummyPosts,
-    comments : [],
 };
 
 const appSlice = createSlice({
@@ -63,6 +63,8 @@ const appSlice = createSlice({
             state.posts.push(action.payload);
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
         },
+
+
         addNewPost: (state, action) =>{
             const newPost: Post = {
                 id: state.posts.length + 1,
@@ -98,14 +100,31 @@ const appSlice = createSlice({
             state.comments.push(action.payload);
         },
         addNewComment: (state, action) => {
-            const newComment: Comment = {
-                id: action.payload.id + 1,
-                postId : action.payload.postId,
-                title: action.payload.title,
-            };
-            // @ts-ignore
-            state.comments[0].push(newComment);
+            const { postId, title } = action.payload;
+            const selectedPostIndex = state.posts.findIndex((post) => post.id === postId);
+
+            if (selectedPostIndex !== -1) {
+                const newComment: Comment = {
+                    id: state.posts[selectedPostIndex].comments.length + 1,
+                    postId : postId,
+                    title,
+                };
+
+                state.posts[selectedPostIndex].comments.push(newComment);
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+            }
         },
+        removeComment: (state, action) => {
+            const { id, postId } = action.payload;
+            const selectedPostIndex = state.posts.findIndex((post) => post.id === postId);
+            state.posts[selectedPostIndex].comments = state.posts[selectedPostIndex].comments.filter(
+                (comment) => comment.id !== id
+            );
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+        },
+
+
+
     },
 });
 
@@ -116,5 +135,6 @@ export const {
     editPost,
     addComment,
     addNewComment,
+    removeComment,
 } = appSlice.actions;
 export default appSlice.reducer;

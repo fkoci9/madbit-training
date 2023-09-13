@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { addComment , addNewComment } from '../redux/postSlice.tsx'; // Assuming you have a Comment type in your postSlice.tsx
+import {addComment, addNewComment, removeComment} from '../redux/postSlice.tsx'; // Assuming you have a Comment type in your postSlice.tsx
 import { RootState } from '../redux/store';
 import { useParams } from 'react-router-dom';
 import React, {useEffect, useState} from "react";
@@ -7,27 +7,31 @@ import React, {useEffect, useState} from "react";
 const CommentPage: React.FC = () => {
     const { postId } = useParams();
     const dispatch = useDispatch();
-
-    const comments = useSelector((state: RootState) => state.app.comments);
     const posts = useSelector((state: RootState) => state.app.posts);
-    const selectedPost = posts.find((post) => post.id.toString() === postId);
+    const selectedPostIndex = posts.findIndex((post) => post.id.toString() === postId);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newComment, setNewComment] = useState({postId: postId, title: '' });
+    const [newComment, setNewComment] = useState({ title: '' });
     console.log('posts' , posts);
+    const comments = useSelector((state: RootState) => state.app.posts[selectedPostIndex].comments);
     console.log('comments' , comments)
 
-
-    useEffect(() => {
+    useEffect(()=>{
         if(comments.length === 0){
-            dispatch(addComment(selectedPost?.comments));
+            dispatch(addComment(comments));
         }
-    }, [dispatch]);
-
-    const handleAddComment = (newComment: { postId: string | undefined; title: string }) =>{
-        dispatch(addNewComment(newComment));
+    },[dispatch, comments])
+    const handleAddComment = () => {
+        const commentToAdd = { postId: postId, title: newComment.title };
+        dispatch(addNewComment(commentToAdd));
         setIsModalOpen(false);
-        setNewComment({postId: postId , title: ''})
+        setNewComment({ title: '' });
     }
+
+    const handleRemoveComment = (id: number) => {
+        dispatch(removeComment({ id, postId: Number(postId) }));
+    }
+
+
 
     return (
         <div>
@@ -51,9 +55,10 @@ const CommentPage: React.FC = () => {
                                     />
                                 </div>
                             </div>
-                            <button className="button is-primary" onClick={() => handleAddComment(newComment)}>
+                            <button className="button is-primary" onClick={() => handleAddComment()}>
                                 Add Comment
                             </button>
+
                         </div>
                     </div>
                     <button
@@ -64,10 +69,10 @@ const CommentPage: React.FC = () => {
                 </div>
             )}
             <ul>
-                {Array.isArray(comments[0]) &&
-                    comments[0].map((comment) => (
+                {comments.map((comment) => (
                         <li key={comment.id}>
                             <h2>{comment.title}</h2>
+                            <button onClick={() => handleRemoveComment(comment.id)}>Remove</button>
                         </li>
                     ))}
             </ul>

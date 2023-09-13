@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import {loginUser} from "../redux/authActions.tsx";
-import {useNavigate} from "react-router-dom";
-
+import { loginUser } from '../redux/authActions.tsx';
+import { useNavigate } from 'react-router-dom';
+import { TextField, Button , Box} from '@mui/material';
 const LoginPage: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -24,11 +24,11 @@ const LoginPage: React.FC = () => {
 
     const handleLogin = () => {
         const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-        console.log(storedUsers)
+        console.log(storedUsers);
         const user = storedUsers.find((u: any) => u.email === email && u.password === password);
 
         if (user) {
-            localStorage.setItem('currentUser' , JSON.stringify(user));
+            localStorage.setItem('currentUser', JSON.stringify(user));
             // @ts-ignore
             dispatch(loginUser());
             navigate('/home');
@@ -49,48 +49,85 @@ const LoginPage: React.FC = () => {
         localStorage.setItem('currentUser', JSON.stringify(newUser));
         localStorage.setItem('users', JSON.stringify(storedUsers));
         setIsRegistering(false);
-        navigate('/home')
+        navigate('/home');
     };
+
     return (
-        <div>
+        <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            minHeight="100vh"
+        >
             <h1>{isRegistering ? 'Register' : 'Login'} Page</h1>
             {isRegistering ? (
-                <>
-                    <input
+                <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                >
+                    <TextField
                         type="email"
-                        placeholder="Email"
+                        label="Email"
                         value={registrationEmail}
                         onChange={(e) => setRegistrationEmail(e.target.value)}
+                        margin="normal"
                     />
-                    <input
+                    <TextField
                         type="password"
-                        placeholder="Password"
+                        label="Password"
                         value={registrationPassword}
                         onChange={(e) => setRegistrationPassword(e.target.value)}
+                        margin="normal"
                     />
-                    <button onClick={handleRegister}>Register</button>
-                    <button onClick={() => setIsRegistering(false)}>Cancel</button>
-                </>
+                    <Button variant="contained" onClick={handleRegister} style={{ margin: '8px 0' }}>
+                        Register
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => setIsRegistering(false)}
+                        style={{ margin: '8px 0' }}
+                    >
+                        Cancel
+                    </Button>
+                </Box>
             ) : (
-                <>
-                    <input
+                <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                >
+                    <TextField
                         type="email"
-                        placeholder="Email"
+                        label="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        margin="normal"
                     />
-                    <input
+                    <TextField
                         type="password"
-                        placeholder="Password"
+                        label="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        margin="normal"
                     />
-                    <button onClick={handleLogin}>Login</button>
-                    <button onClick={() => setIsRegistering(true)}>Register here</button>
+                    <Button variant="contained" onClick={handleLogin} style={{ margin: '8px 0' }}>
+                        Login
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => setIsRegistering(true)}
+                        style={{ margin: '8px 0' }}
+                    >
+                        Register here
+                    </Button>
                     {error && <p>{error}</p>}
-                </>
+                </Box>
             )}
-        </div>
+        </Box>
     );
 };
 

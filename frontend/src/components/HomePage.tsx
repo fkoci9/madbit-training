@@ -5,6 +5,23 @@ import { editPost, removePost, addPost , addNewPost } from '../redux/postSlice.t
 import { logout } from "../redux/authSlice.tsx";
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
+import {
+    AppBar,
+    Toolbar,
+    Typography,
+    Button,
+    Container,
+    Modal,
+    TextField,
+    Box,
+    Grid,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText, Stack,
+} from '@mui/material';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const HomePage: React.FC = () => {
     const dispatch = useDispatch();
@@ -24,8 +41,8 @@ const HomePage: React.FC = () => {
 
     const handleAddPost = (newPost: {title:string , author:string}) => {
         dispatch(addNewPost(newPost));
-        setIsModalOpen(false); // Close the modal after adding a new post
-        setNewPost({ title : '', author: ''}); // Clear input fields
+        setIsModalOpen(false);
+        setNewPost({ title : '', author: ''});
     };
 
     const handleRemovePost = (postId: number) => {
@@ -34,7 +51,6 @@ const HomePage: React.FC = () => {
 
     const handleEditPost = (postId: number) => {
         setEditingPostId(postId);
-        // Set the edited title to the current post's title
         const postToEdit = posts.find((post) => post.id === postId);
         if (postToEdit) {
             setEditedTitle(postToEdit.title);
@@ -61,80 +77,121 @@ const HomePage: React.FC = () => {
 
     return (
         <div>
-            <h1>Home Page</h1>
-            <button onClick={handleLogout}>Log Out</button>
-            <button onClick={() => setIsModalOpen(true)}>Add New</button>
-            {isModalOpen && (
-                <div className="modal is-active">
-                    <div className="modal-background" onClick={() => setIsModalOpen(false)}></div>
-                    <div className="modal-content">
-                        <div className="box">
-                            <h2>Add New Post</h2>
-                            <div className="field">
-                                <label className="label">Title</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
+            <AppBar position="static">
+                <Toolbar>
+                    <Grid container alignItems="center" justifyContent="space-between">
+                        <Grid item>
+                            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                                Home Page
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <IconButton color="inherit" onClick={handleLogout}>
+                                <LogoutIcon />
+                            </IconButton>
+                        </Grid>
+                    </Grid>
+                </Toolbar>
+            </AppBar>
+            <Container>
+                {isModalOpen && (
+                    <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                        <Container maxWidth="sm" sx={{ mt: 4 }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <h2>Add New Post</h2>
+                                <TextField
+                                    type="text"
+                                    label="Title"
+                                    value={newPost.title}
+                                    onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                                    variant="outlined"
+                                    margin="normal"
+                                />
+                                <TextField
+                                    type="text"
+                                    label="Author"
+                                    value={newPost.author}
+                                    onChange={(e) => setNewPost({ ...newPost, author: e.target.value })}
+                                    variant="outlined"
+                                    margin="normal"
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => handleAddPost(newPost)}
+                                    sx={{ mt: 2 }}
+                                >
+                                    Add Post
+                                </Button>
+                            </Box>
+                        </Container>
+                    </Modal>
+                )}
+                <List sx={{ mt: 2 }}>
+                    {posts.map((post) => (
+                        <ListItem key={post.id}>
+                            {currentUserType === 'admin' && editingPostId === post.id ? (
+                                <Stack direction="row" spacing={3}>
+                                    <TextField
                                         type="text"
-                                        placeholder="Enter title"
-                                        value={newPost.title}
-                                        onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            <div className="field">
-                                <label className="label">Author</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="text"
-                                        placeholder="Enter author"
-                                        value={newPost.author}
-                                        onChange={(e) => setNewPost({ ...newPost, author: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            <button className="button is-primary" onClick={() => handleAddPost(newPost)}>
-                                Add Post
-                            </button>
-                        </div>
-                    </div>
-                    <button
-                        className="modal-close is-large"
-                        aria-label="close"
-                        onClick={() => setIsModalOpen(false)}
-                    >Cancel</button>
-                </div>
-            )}
-            <ul>
-                {posts.map((post) => (
-                    <li key={post.id}>
-                        {currentUserType === 'admin' && editingPostId === post.id ? (
-                            <>
-                                <div>
-                                    {/* Use the editedTitle in the input field */}
-                                    <input
-                                        type="text"
+                                        label="Title"
                                         value={editedTitle}
                                         onChange={(e) => setEditedTitle(e.target.value)}
+                                        variant="outlined"
+                                        margin="normal"
+                                        size="small"
+                                        sx={{ flexGrow: 1 }}
                                     />
-                                </div>
-                                <button onClick={() => handleSavePost(post.id , editedTitle)}>Save</button>
-                                <button onClick={handleCancelEdit}>Cancel</button>
-                            </>
-                        ) : null}
-                        <h2>{post.title}</h2>
-                        <p>Author: {post.author}</p>
-                        {currentUserType === 'admin' ? (
-                            <>
-                                <button onClick={() => handleRemovePost(post.id)}>Remove</button>
-                                <button onClick={() => handleEditPost(post.id)}>Edit</button>
-                                <Link to={`/comments/${post.id}`}>View Comments</Link>
-                            </>
-                        ) : null}
-                    </li>
-                ))}
-            </ul>
+                                    <Button
+                                        size="small"
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => handleSavePost(post.id, editedTitle)}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button variant="contained" onClick={handleCancelEdit}>
+                                        Cancel
+                                    </Button>
+                                </Stack>
+                            ) : (
+                                <>
+                                    <ListItemText primary={editingPostId !== post.id ? post.title : ''} secondary={`Author: ${post.author}`} />
+                                    {currentUserType === 'admin' ? (
+                                        <Stack direction="row" spacing={3}>
+                                            <Button
+                                                variant="contained"
+                                                color="secondary"
+                                                onClick={() => handleRemovePost(post.id)}
+                                            >
+                                                Remove
+                                            </Button>
+                                            <Button variant="contained" onClick={() => handleEditPost(post.id)}>
+                                                Edit
+                                            </Button>
+                                            <Link to={`/comments/${post.id}`}>View Comments</Link>
+                                        </Stack>
+                                    ) : null}
+                                </>
+                            )}
+                        </ListItem>
+                    ))}
+                </List>
+            </Container>
+            <Box
+                sx={{
+                    position: 'fixed',
+                    bottom: '16px',
+                    right: '16px',
+                }}
+            >
+                {currentUserType === 'admin' && (
+                    <IconButton color="primary" size="large" onClick={() => setIsModalOpen(true)}>
+                        <PostAddIcon fontSize="large" />
+                    </IconButton>
+                )}
+            </Box>
+
         </div>
     );
 };
