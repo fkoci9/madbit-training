@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+import png1 from "../../public/avatar/png1.jpg";
+import png2 from "../../public/avatar/png2.jpg";
 export interface Comment {
   id: number;
   postId: number;
@@ -10,6 +11,7 @@ interface Post {
   id: number;
   title: string;
   author: string;
+  avatar: any;
   comments: Comment[];
 }
 
@@ -18,6 +20,7 @@ const dummyPosts: Post[] = [
     id: 1,
     title: "Post 1",
     author: "Author 1",
+    avatar: png1,
     comments: [
       { id: 1, postId: 1, title: "Comment 1 of Post 1" },
       { id: 2, postId: 1, title: "Comment 2 of Post 1" },
@@ -27,6 +30,7 @@ const dummyPosts: Post[] = [
     id: 2,
     title: "Post 2",
     author: "Author 2",
+    avatar: png2,
     comments: [
       { id: 2, postId: 2, title: "Comment 1 of Post 2" },
       { id: 2, postId: 2, title: "Comment 2 of Post 2" },
@@ -36,12 +40,14 @@ const dummyPosts: Post[] = [
     id: 3,
     title: "Post 3",
     author: "Author 3",
+    avatar: png1,
     comments: [{ id: 3, postId: 3, title: "Comment 1 of Post 3" }],
   },
   {
     id: 4,
     title: "Post 4",
     author: "Author 2",
+    avatar: png2,
     comments: [
       { id: 1, postId: 4, title: "Comment 1 of Post 4" },
       { id: 2, postId: 4, title: "Comment 2 of Post 4" },
@@ -72,6 +78,7 @@ const appSlice = createSlice({
         id: state.posts.length + 1,
         title: action.payload.title,
         author: action.payload.author,
+        avatar: png1,
         comments: [],
       };
       const newState = {
