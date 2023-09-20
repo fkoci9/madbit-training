@@ -6,7 +6,6 @@ export interface Comment {
   postId: number;
   title: string;
 }
-
 interface Post {
   id: number;
   title: string;
@@ -56,7 +55,6 @@ const dummyPosts: Post[] = [
     ],
   },
 ];
-
 interface AppState {
   posts: Post[];
 }
@@ -69,6 +67,7 @@ const initialState: AppState = storedState
       posts: dummyPosts,
     };
 
+// @ts-ignore
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -173,6 +172,49 @@ const appSlice = createSlice({
       }
       return state;
     },
+    editComment: (state, action) => {
+      const { id, postId, updatedContent } = action.payload;
+      const selectedPostIndex = state.posts.findIndex(
+        (post) => post.id === postId,
+      );
+      const selectedCommentIndex = state.posts[
+        selectedPostIndex
+      ].comments.findIndex((comment) => comment.id === id);
+      if (selectedPostIndex !== -1) {
+        const selectedComment = state.posts[selectedPostIndex].comments.find(
+          (comment) => comment.id === id,
+        );
+        const updatedComment = {
+          ...selectedComment,
+          title: updatedContent,
+        };
+        const newState = {
+          ...state,
+          posts: [
+            ...state.posts.slice(0, selectedPostIndex),
+
+            {
+              ...state.posts[selectedPostIndex],
+              comments: [
+                ...state.posts[selectedPostIndex].comments.slice(
+                  0,
+                  selectedCommentIndex,
+                ),
+                updatedComment,
+                ...state.posts[selectedPostIndex].comments.slice(
+                  selectedCommentIndex + 1,
+                ),
+              ],
+            },
+
+            ...state.posts.slice(selectedPostIndex + 1),
+          ],
+        };
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newState));
+        console.log(newState);
+        return newState;
+      }
+    },
   },
 });
 
@@ -182,5 +224,6 @@ export const {
   editPost,
   addNewComment,
   removeComment,
+  editComment,
 } = appSlice.actions;
 export default appSlice.reducer;

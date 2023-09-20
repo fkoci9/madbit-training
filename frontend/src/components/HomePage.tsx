@@ -191,16 +191,16 @@ const HomePage: React.FC = () => {
                         <>
                           <Button
                             variant="contained"
+                            onClick={() => handleEditPost(post.id)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="contained"
                             color="secondary"
                             onClick={() => handleRemovePost(post.id)}
                           >
                             Remove
-                          </Button>
-                          <Button
-                            variant="contained"
-                            onClick={() => handleEditPost(post.id)}
-                          >
-                            Edit
                           </Button>
                         </>
                       </Stack>

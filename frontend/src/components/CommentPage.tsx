@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addNewComment, removeComment } from "../redux/postSlice.tsx";
+import {
+  addNewComment,
+  removeComment,
+  editComment,
+} from "../redux/postSlice.tsx";
 import { RootState } from "../redux/store";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -30,24 +34,43 @@ const CommentPage: React.FC = () => {
     (post) => post.id.toString() === postId,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [newComment, setNewComment] = useState({ title: "" });
-  console.log("posts", posts);
+  const [editedComment, setEditedComment] = useState({ id: -1, title: "" }); // Track the edited comment
+
   const comments = useSelector(
     (state: RootState) => state.app.posts[selectedPostIndex].comments,
   );
-  console.log("comments", comments);
   const navigate = useNavigate();
 
   const handleAddComment = () => {
     const commentToAdd = { postId: Number(postId), title: newComment.title };
     dispatch(addNewComment(commentToAdd));
-    console.log(commentToAdd);
     setIsModalOpen(false);
     setNewComment({ title: "" });
   };
 
   const handleRemoveComment = (id: number) => {
     dispatch(removeComment({ id, postId: Number(postId) }));
+  };
+
+  const handleEditComment = (commentId: number) => {
+    const comment = comments.find((comment) => comment.id === commentId);
+    if (comment) {
+      setEditedComment({ id: commentId, title: comment.title });
+    }
+    setIsEditing(true);
+  };
+
+  const handleSaveEditComment = (id: number) => {
+    dispatch(
+      editComment({
+        id: id,
+        postId: Number(postId),
+        updatedContent: editedComment.title,
+      }),
+    );
+    setIsEditing(false);
   };
 
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
@@ -116,10 +139,42 @@ const CommentPage: React.FC = () => {
             <Grid item key={comment.id} xs={12} sm={6} md={4} lg={3}>
               <Card>
                 <CardContent>
-                  <Typography variant="h6">{comment.title}</Typography>
+                  {editedComment.id === comment.id && isEditing ? (
+                    <TextField
+                      type="text"
+                      label="Title"
+                      value={editedComment.title}
+                      onChange={(e) =>
+                        setEditedComment({
+                          ...editedComment,
+                          title: e.target.value,
+                        })
+                      }
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  ) : (
+                    <Typography variant="h6">{comment.title}</Typography>
+                  )}
                 </CardContent>
                 {currentUserType === "admin" && (
                   <CardActions>
+                    {editedComment.id === comment.id && isEditing ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleSaveEditComment(comment.id)}
+                      >
+                        Save
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        onClick={() => handleEditComment(comment.id)}
+                      >
+                        Edit
+                      </Button>
+                    )}
                     <Button
                       variant="contained"
                       color="secondary"
