@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store.tsx";
 import { editPost, removePost, addNewPost } from "../redux/postSlice.tsx";
 import { logout } from "../redux/authSlice.tsx";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -147,8 +146,22 @@ const HomePage: React.FC = () => {
         <Grid container spacing={2}>
           {posts.map((post) => (
             <Grid item key={post.id} xs={12} sm={6} md={4} lg={3}>
-              <Card>
-                <CardContent>
+              <Card
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
+                <CardContent
+                  sx={{
+                    flexGrow: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   {currentUserType === "admin" && editingPostId === post.id ? (
                     <Stack direction="row" spacing={3}>
                       <TextField
@@ -175,16 +188,24 @@ const HomePage: React.FC = () => {
                     </Stack>
                   ) : (
                     <>
-                      <Typography variant="h6">
+                      <RouterLink to={`/comments/${post.id}`}>
+                        <img
+                          src={post.avatar}
+                          alt="Author Avatar"
+                          width="100"
+                          height="100"
+                        />
+                      </RouterLink>
+                      <Typography variant="h6" align="center">
                         {editingPostId !== post.id ? post.title : ""}
                       </Typography>
-                      <Typography color="textSecondary">
+                      <Typography color="textSecondary" align="center">
                         Author: {post.author}
                       </Typography>
                     </>
                   )}
                 </CardContent>
-                <CardActions>
+                <CardActions sx={{ justifyContent: "center" }}>
                   <Stack direction="column" spacing={2}>
                     {currentUserType === "admin" ? (
                       <Stack direction="row" spacing={2}>
@@ -205,7 +226,6 @@ const HomePage: React.FC = () => {
                         </>
                       </Stack>
                     ) : null}
-                    <Link to={`/comments/${post.id}`}>View Comments</Link>
                   </Stack>
                 </CardActions>
               </Card>

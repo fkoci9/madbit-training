@@ -10,7 +10,7 @@ interface Post {
   id: number;
   title: string;
   author: string;
-  avatar: any;
+  avatar: string;
   comments: Comment[];
 }
 
@@ -177,43 +177,40 @@ const appSlice = createSlice({
       const selectedPostIndex = state.posts.findIndex(
         (post) => post.id === postId,
       );
-      const selectedCommentIndex = state.posts[
-        selectedPostIndex
-      ].comments.findIndex((comment) => comment.id === id);
       if (selectedPostIndex !== -1) {
-        const selectedComment = state.posts[selectedPostIndex].comments.find(
-          (comment) => comment.id === id,
-        );
-        const updatedComment = {
-          ...selectedComment,
-          title: updatedContent,
-        };
-        const newState = {
-          ...state,
-          posts: [
-            ...state.posts.slice(0, selectedPostIndex),
+        const selectedCommentIndex = state.posts[
+          selectedPostIndex
+        ].comments.findIndex((comment) => comment.id === id);
+        if (selectedCommentIndex !== -1) {
+          const selectedComment =
+            state.posts[selectedPostIndex].comments[selectedCommentIndex];
+          const updatedComment: Comment = {
+            ...selectedComment,
+            title: updatedContent,
+          };
+          const updatedComments = [...state.posts[selectedPostIndex].comments];
+          updatedComments[selectedCommentIndex] = updatedComment;
 
-            {
-              ...state.posts[selectedPostIndex],
-              comments: [
-                ...state.posts[selectedPostIndex].comments.slice(
-                  0,
-                  selectedCommentIndex,
-                ),
-                updatedComment,
-                ...state.posts[selectedPostIndex].comments.slice(
-                  selectedCommentIndex + 1,
-                ),
-              ],
-            },
+          const updatedPost: Post = {
+            ...state.posts[selectedPostIndex],
+            comments: updatedComments,
+          };
 
-            ...state.posts.slice(selectedPostIndex + 1),
-          ],
-        };
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newState));
-        console.log(newState);
-        return newState;
+          const newState = {
+            ...state,
+            posts: [
+              ...state.posts.slice(0, selectedPostIndex),
+              updatedPost,
+              ...state.posts.slice(selectedPostIndex + 1),
+            ],
+          };
+
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newState));
+          console.log(newState);
+          return newState;
+        }
       }
+      return state;
     },
   },
 });
