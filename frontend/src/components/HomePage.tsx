@@ -26,7 +26,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 const HomePage: React.FC = () => {
   const dispatch = useDispatch();
   const posts = useSelector((state: RootState) => state.app.posts);
-  console.log(posts);
+  console.log("state of posts : ", posts);
   const navigate = useNavigate();
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -24,7 +24,9 @@ import {
 } from "@mui/material";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { logout } from "../redux/authSlice.tsx";
+import { Link as RouterLink } from "react-router-dom";
 
 const CommentPage: React.FC = () => {
   const { postId } = useParams();
@@ -41,6 +43,7 @@ const CommentPage: React.FC = () => {
   const comments = useSelector(
     (state: RootState) => state.app.posts[selectedPostIndex].comments,
   );
+  console.log("comments of post : ", posts[selectedPostIndex].id, comments);
   const navigate = useNavigate();
 
   const handleAddComment = () => {
@@ -87,6 +90,11 @@ const CommentPage: React.FC = () => {
       <AppBar position="static">
         <Toolbar>
           <Grid container alignItems="center" justifyContent="space-between">
+            <Grid item>
+              <IconButton component={RouterLink} to="/home" color="inherit">
+                <ArrowBackIcon />
+              </IconButton>
+            </Grid>
             <Grid item>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 Comments for Post {postId}

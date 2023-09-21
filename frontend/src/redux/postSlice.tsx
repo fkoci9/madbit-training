@@ -32,7 +32,7 @@ const dummyPosts: Post[] = [
     avatar: png2,
     comments: [
       { id: 2, postId: 2, title: "Comment 1 of Post 2" },
-      { id: 2, postId: 2, title: "Comment 2 of Post 2" },
+      { id: 3, postId: 2, title: "Comment 2 of Post 2" },
     ],
   },
   {
@@ -67,7 +67,6 @@ const initialState: AppState = storedState
       posts: dummyPosts,
     };
 
-// @ts-ignore
 const appSlice = createSlice({
   name: "app",
   initialState,
